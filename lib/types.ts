@@ -25,11 +25,6 @@ export interface ChecklistItem {
   quantity: string;
 }
 
-export interface ChecklistBase {
-  householdSize: number;
-  items: ChecklistItem[];
-}
-
 export interface UserInput {
   city: string;
   householdSize: number;
