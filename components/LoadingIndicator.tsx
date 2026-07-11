@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { UiStrings } from "@/lib/uiStrings";
 
 export type LoadingStage = "weather" | "plan";
@@ -7,7 +8,7 @@ interface LoadingIndicatorProps {
   strings: UiStrings;
 }
 
-export function LoadingIndicator({ stage, strings }: LoadingIndicatorProps) {
+function LoadingIndicatorComponent({ stage, strings }: LoadingIndicatorProps) {
   const text = stage === "weather" ? strings.fetchingForecast : strings.generatingPlan;
   return (
     <div role="status" className="flex w-full max-w-md items-center justify-center gap-3 rounded-lg border border-slate-700 bg-slate-800/50 px-4 py-4 text-sm text-slate-300">
@@ -19,3 +20,5 @@ export function LoadingIndicator({ stage, strings }: LoadingIndicatorProps) {
     </div>
   );
 }
+
+export const LoadingIndicator = memo(LoadingIndicatorComponent);

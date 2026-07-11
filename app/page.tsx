@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { LoadingIndicator, type LoadingStage } from "@/components/LoadingIndicator";
 import { PlanForm } from "@/components/PlanForm";
-import { ResultsDetails, ResultsOverview } from "@/components/ResultsView";
+import { ResultsDetails } from "@/components/ResultsDetails";
+import { ResultsOverview } from "@/components/ResultsOverview";
 import { debounce } from "@/lib/debounce";
 import type { PreparednessPlan, UserInput, WeatherData } from "@/lib/types";
 import { getUiStrings } from "@/lib/uiStrings";
@@ -52,6 +53,9 @@ export default function Home() {
     }
   }, []);
 
+  // The debounced call only forwards to handleSubmit; it's cancelled on
+  // unmount (see effect below) so a pending regenerate can't fire against a
+  // dead component after the user navigates away mid-debounce.
   const debouncedRegenerate = useMemo(
     () =>
       debounce((lang: string, input: { city: string; householdSize: number }) => {
@@ -60,14 +64,21 @@ export default function Home() {
     [handleSubmit],
   );
 
-  function handleLanguageChange(newLanguage: string) {
-    setLanguage(newLanguage);
-    if (result && submittedInput) {
-      debouncedRegenerate(newLanguage, submittedInput);
-    }
-  }
+  useEffect(() => {
+    return () => debouncedRegenerate.cancel();
+  }, [debouncedRegenerate]);
 
-  const strings = getUiStrings(language);
+  const handleLanguageChange = useCallback(
+    (newLanguage: string) => {
+      setLanguage(newLanguage);
+      if (result && submittedInput) {
+        debouncedRegenerate(newLanguage, submittedInput);
+      }
+    },
+    [result, submittedInput, debouncedRegenerate],
+  );
+
+  const strings = useMemo(() => getUiStrings(language), [language]);
 
   return (
     <div className="flex flex-1 flex-col items-center bg-slate-950 px-4 py-10 sm:py-12">
@@ -77,8 +88,14 @@ export default function Home() {
           <p className="mx-auto mt-2 max-w-md text-slate-400">{strings.subtitle}</p>
         </header>
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(320px,380px)_1fr] lg:items-start">
-          <div className="flex flex-col items-center gap-6 lg:items-stretch">
+        <div className={result ? "grid gap-6 lg:grid-cols-[minmax(320px,380px)_1fr] lg:items-start" : undefined}>
+          <div
+            className={
+              result
+                ? "flex flex-col items-center gap-6 lg:items-stretch"
+                : "mx-auto flex w-full max-w-md flex-col gap-6"
+            }
+          >
             <PlanForm
               onSubmit={handleSubmit}
               isLoading={isLoading}
@@ -95,11 +112,15 @@ export default function Home() {
               </p>
             )}
 
-            {result && <ResultsOverview weather={result.weather} plan={result.plan} strings={strings} />}
+            {result && (
+              <div className="fade-in w-full">
+                <ResultsOverview weather={result.weather} plan={result.plan} strings={strings} />
+              </div>
+            )}
           </div>
 
           {result && (
-            <div>
+            <div className="fade-in">
               <ResultsDetails plan={result.plan} strings={strings} />
             </div>
           )}

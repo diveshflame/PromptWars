@@ -14,6 +14,14 @@ export interface LlmPlanContent {
   travelAdvisory: string;
 }
 
+interface GeminiGenerateContentResponse {
+  candidates?: Array<{
+    content?: {
+      parts?: Array<{ text?: string }>;
+    };
+  }>;
+}
+
 const RESPONSE_SCHEMA = {
   type: "object",
   properties: {
@@ -102,7 +110,7 @@ export async function generatePlan(
     throw new LlmError(`Gemini API request failed (${res.status}): ${body}`);
   }
 
-  const data = await res.json();
+  const data = (await res.json()) as GeminiGenerateContentResponse;
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
   if (!text) {
     throw new LlmError("Gemini API returned no content");

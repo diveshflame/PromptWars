@@ -40,4 +40,22 @@ describe("debounce", () => {
     expect(fn).toHaveBeenCalledTimes(1);
     expect(fn).toHaveBeenCalledWith("c");
   });
+
+  it("cancel() prevents a pending call from firing (e.g. on component unmount)", () => {
+    const fn = vi.fn();
+    const debounced = debounce(fn, 400);
+
+    debounced("x");
+    debounced.cancel();
+    vi.advanceTimersByTime(1000);
+
+    expect(fn).not.toHaveBeenCalled();
+  });
+
+  it("cancel() is a no-op when nothing is pending", () => {
+    const fn = vi.fn();
+    const debounced = debounce(fn, 400);
+
+    expect(() => debounced.cancel()).not.toThrow();
+  });
 });

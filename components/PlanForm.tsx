@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useState } from "react";
 import type { UserInput } from "@/lib/types";
 import type { UiStrings } from "@/lib/uiStrings";
 
@@ -27,7 +27,7 @@ interface PlanFormProps {
   strings: UiStrings;
 }
 
-export function PlanForm({ onSubmit, isLoading, language, onLanguageChange, strings }: PlanFormProps) {
+function PlanFormComponent({ onSubmit, isLoading, language, onLanguageChange, strings }: PlanFormProps) {
   const [city, setCity] = useState("");
   const [householdSize, setHouseholdSize] = useState(1);
 
@@ -101,3 +101,5 @@ export function PlanForm({ onSubmit, isLoading, language, onLanguageChange, stri
     </form>
   );
 }
+
+export const PlanForm = memo(PlanFormComponent);

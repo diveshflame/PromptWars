@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { Severity } from "@/lib/types";
 import type { UiStrings } from "@/lib/uiStrings";
 
@@ -14,7 +15,7 @@ interface AlertBannerProps {
   strings: UiStrings;
 }
 
-export function AlertBanner({ severity, alert, strings }: AlertBannerProps) {
+function AlertBannerComponent({ severity, alert, strings }: AlertBannerProps) {
   return (
     <div
       role="alert"
@@ -27,3 +28,5 @@ export function AlertBanner({ severity, alert, strings }: AlertBannerProps) {
     </div>
   );
 }
+
+export const AlertBanner = memo(AlertBannerComponent);
