@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { UserInput } from "@/lib/types";
+import type { UiStrings } from "@/lib/uiStrings";
 
 const LANGUAGES = [
   "English",
@@ -21,12 +22,14 @@ const LANGUAGES = [
 interface PlanFormProps {
   onSubmit: (input: UserInput) => void;
   isLoading: boolean;
+  language: string;
+  onLanguageChange: (language: string) => void;
+  strings: UiStrings;
 }
 
-export function PlanForm({ onSubmit, isLoading }: PlanFormProps) {
+export function PlanForm({ onSubmit, isLoading, language, onLanguageChange, strings }: PlanFormProps) {
   const [city, setCity] = useState("");
   const [householdSize, setHouseholdSize] = useState(1);
-  const [language, setLanguage] = useState("English");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -38,7 +41,7 @@ export function PlanForm({ onSubmit, isLoading }: PlanFormProps) {
     <form onSubmit={handleSubmit} className="w-full max-w-md space-y-5" aria-label="Monsoon preparedness request form">
       <div>
         <label htmlFor="city" className="block text-sm font-medium text-slate-200">
-          City
+          {strings.city}
         </label>
         <input
           id="city"
@@ -47,14 +50,14 @@ export function PlanForm({ onSubmit, isLoading }: PlanFormProps) {
           required
           value={city}
           onChange={(e) => setCity(e.target.value)}
-          placeholder="e.g. Mumbai"
+          placeholder={strings.cityPlaceholder}
           className="mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 px-4 py-2.5 text-slate-100 placeholder-slate-500 focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-400/40"
         />
       </div>
 
       <div>
         <label htmlFor="householdSize" className="block text-sm font-medium text-slate-200">
-          Household size
+          {strings.householdSize}
         </label>
         <input
           id="householdSize"
@@ -71,13 +74,13 @@ export function PlanForm({ onSubmit, isLoading }: PlanFormProps) {
 
       <div>
         <label htmlFor="language" className="block text-sm font-medium text-slate-200">
-          Language
+          {strings.language}
         </label>
         <select
           id="language"
           name="language"
           value={language}
-          onChange={(e) => setLanguage(e.target.value)}
+          onChange={(e) => onLanguageChange(e.target.value)}
           className="mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 px-4 py-2.5 text-slate-100 focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-400/40"
         >
           {LANGUAGES.map((lang) => (
@@ -93,7 +96,7 @@ export function PlanForm({ onSubmit, isLoading }: PlanFormProps) {
         disabled={isLoading}
         className="w-full rounded-lg bg-teal-500 px-4 py-3 font-semibold text-slate-950 transition-colors hover:bg-teal-400 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isLoading ? "Preparing your plan…" : "Get preparedness plan"}
+        {isLoading ? strings.submitting : strings.submit}
       </button>
     </form>
   );

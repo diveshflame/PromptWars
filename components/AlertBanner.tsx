@@ -1,4 +1,5 @@
 import type { Severity } from "@/lib/types";
+import type { UiStrings } from "@/lib/uiStrings";
 
 const SEVERITY_STYLES: Record<Severity, string> = {
   low: "bg-emerald-900/40 border-emerald-500 text-emerald-200",
@@ -10,15 +11,18 @@ const SEVERITY_STYLES: Record<Severity, string> = {
 interface AlertBannerProps {
   severity: Severity;
   alert: string | null;
+  strings: UiStrings;
 }
 
-export function AlertBanner({ severity, alert }: AlertBannerProps) {
+export function AlertBanner({ severity, alert, strings }: AlertBannerProps) {
   return (
     <div
       role="alert"
       className={`w-full rounded-lg border-l-4 px-4 py-3 ${SEVERITY_STYLES[severity]}`}
     >
-      <p className="text-xs font-semibold uppercase tracking-wide">Severity: {severity}</p>
+      <p className="text-xs font-semibold uppercase tracking-wide">
+        {strings.severity}: {severity}
+      </p>
       {alert && <p className="mt-1 text-sm">{alert}</p>}
     </div>
   );

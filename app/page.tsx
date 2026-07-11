@@ -1,24 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { LoadingIndicator, type LoadingStage } from "@/components/LoadingIndicator";
 import { PlanForm } from "@/components/PlanForm";
-import { ResultsView } from "@/components/ResultsView";
+import { ResultsDetails, ResultsOverview } from "@/components/ResultsView";
+import { debounce } from "@/lib/debounce";
 import type { PreparednessPlan, UserInput, WeatherData } from "@/lib/types";
+import { getUiStrings } from "@/lib/uiStrings";
 
 interface ApiResult {
   weather: WeatherData;
   plan: PreparednessPlan;
 }
 
+const LANGUAGE_CHANGE_DEBOUNCE_MS = 450;
+const WEATHER_STAGE_DURATION_MS = 1200;
+
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingStage, setLoadingStage] = useState<LoadingStage>("weather");
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ApiResult | null>(null);
+  const [language, setLanguage] = useState("English");
+  const [submittedInput, setSubmittedInput] = useState<{ city: string; householdSize: number } | null>(null);
 
-  async function handleSubmit(input: UserInput) {
+  const handleSubmit = useCallback(async (input: UserInput) => {
     setIsLoading(true);
+    setLoadingStage("weather");
     setError(null);
-    setResult(null);
+
+    const stageTimer = setTimeout(() => setLoadingStage("plan"), WEATHER_STAGE_DURATION_MS);
 
     try {
       const res = await fetch("/api/plan", {
@@ -28,36 +39,71 @@ export default function Home() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "Something went wrong.");
+        setError(data.error ?? "Something went wrong. Please try again.");
         return;
       }
       setResult(data);
+      setSubmittedInput({ city: input.city, householdSize: input.householdSize });
     } catch {
-      setError("Could not reach the server. Please try again.");
+      setError("Could not reach the server. Please check your connection and try again.");
     } finally {
+      clearTimeout(stageTimer);
       setIsLoading(false);
+    }
+  }, []);
+
+  const debouncedRegenerate = useMemo(
+    () =>
+      debounce((lang: string, input: { city: string; householdSize: number }) => {
+        handleSubmit({ ...input, language: lang });
+      }, LANGUAGE_CHANGE_DEBOUNCE_MS),
+    [handleSubmit],
+  );
+
+  function handleLanguageChange(newLanguage: string) {
+    setLanguage(newLanguage);
+    if (result && submittedInput) {
+      debouncedRegenerate(newLanguage, submittedInput);
     }
   }
 
+  const strings = getUiStrings(language);
+
   return (
-    <div className="flex flex-1 flex-col items-center bg-slate-950 px-4 py-12 sm:py-16">
-      <main className="flex w-full max-w-2xl flex-col items-center gap-8">
-        <header className="text-center">
+    <div className="flex flex-1 flex-col items-center bg-slate-950 px-4 py-10 sm:py-12">
+      <main className="w-full max-w-6xl">
+        <header className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-slate-50 sm:text-4xl">Monsoon Ready</h1>
-          <p className="mt-2 max-w-md text-slate-400">
-            Real-time forecast, AI-personalized preparedness plans, in your language.
-          </p>
+          <p className="mx-auto mt-2 max-w-md text-slate-400">{strings.subtitle}</p>
         </header>
 
-        <PlanForm onSubmit={handleSubmit} isLoading={isLoading} />
+        <div className="grid gap-6 lg:grid-cols-[minmax(320px,380px)_1fr] lg:items-start">
+          <div className="flex flex-col items-center gap-6 lg:items-stretch">
+            <PlanForm
+              onSubmit={handleSubmit}
+              isLoading={isLoading}
+              language={language}
+              onLanguageChange={handleLanguageChange}
+              strings={strings}
+            />
 
-        {error && (
-          <p role="alert" className="w-full max-w-md rounded-lg border border-red-600 bg-red-900/30 px-4 py-3 text-sm text-red-200">
-            {error}
-          </p>
-        )}
+            {isLoading && <LoadingIndicator stage={loadingStage} strings={strings} />}
 
-        {result && <ResultsView weather={result.weather} plan={result.plan} />}
+            {error && (
+              <p role="alert" className="w-full max-w-md rounded-lg border border-red-600 bg-red-900/30 px-4 py-3 text-sm text-red-200">
+                {error}
+              </p>
+            )}
+
+            {result && <ResultsOverview weather={result.weather} plan={result.plan} strings={strings} />}
+          </div>
+
+          {result && (
+            <div>
+              <ResultsDetails plan={result.plan} strings={strings} />
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );

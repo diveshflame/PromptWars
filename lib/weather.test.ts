@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getSeverity } from "./weather";
 import type { DailyForecast } from "./types";
 
@@ -33,5 +33,40 @@ describe("getSeverity", () => {
   it("only considers the first 3 days of the forecast", () => {
     const daily = [day(0, 0), day(0, 0), day(0, 0), day(300, 100)];
     expect(getSeverity({ daily })).toBe("low");
+  });
+});
+
+describe("fetchWeather geocoding fallback", () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("throws a friendly, retryable error suggesting a nearby city when nothing is found", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: async () => [] }),
+    );
+
+    const { fetchWeather, WeatherLookupError } = await import("./weather");
+
+    try {
+      await fetchWeather("Notarealplacexyz");
+      expect.fail("expected fetchWeather to throw");
+    } catch (err) {
+      expect(err).toBeInstanceOf(WeatherLookupError);
+      expect((err as Error).message).toMatch(/nearby larger city/i);
+    }
+  });
+
+  it("throws a friendly error when the geocoding request itself fails", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, json: async () => ({}) }));
+
+    const { fetchWeather, WeatherLookupError } = await import("./weather");
+
+    await expect(fetchWeather("Anywhere")).rejects.toBeInstanceOf(WeatherLookupError);
   });
 });

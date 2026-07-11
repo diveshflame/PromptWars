@@ -1,11 +1,7 @@
 import { CloudRain, Wind, ShieldCheck, PlaneTakeoff, ListChecks } from "lucide-react";
 import type { PreparednessPlan, WeatherData } from "@/lib/types";
+import type { UiStrings } from "@/lib/uiStrings";
 import { AlertBanner } from "./AlertBanner";
-
-interface ResultsViewProps {
-  weather: WeatherData;
-  plan: PreparednessPlan;
-}
 
 function Section({ title, items }: { title: string; items: string[] }) {
   return (
@@ -25,9 +21,15 @@ function Section({ title, items }: { title: string; items: string[] }) {
   );
 }
 
-export function ResultsView({ weather, plan }: ResultsViewProps) {
+interface ResultsOverviewProps {
+  weather: WeatherData;
+  plan: PreparednessPlan;
+  strings: UiStrings;
+}
+
+export function ResultsOverview({ weather, plan, strings }: ResultsOverviewProps) {
   return (
-    <div className="w-full max-w-2xl space-y-6">
+    <div className="w-full space-y-6">
       <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-5">
         <h2 className="text-xl font-bold text-slate-100">
           {weather.locationName}, {weather.country}
@@ -44,26 +46,37 @@ export function ResultsView({ weather, plan }: ResultsViewProps) {
         </div>
       </div>
 
-      <AlertBanner severity={plan.severity} alert={plan.alert} />
+      <AlertBanner severity={plan.severity} alert={plan.alert} strings={strings} />
 
       <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-5">
         <h3 className="flex items-center gap-2 text-lg font-semibold text-teal-300">
           <PlaneTakeoff aria-hidden="true" className="h-5 w-5" />
-          Travel advisory
+          {strings.travelAdvisory}
         </h3>
         <p className="mt-2 text-sm text-slate-200">{plan.travelAdvisory}</p>
       </div>
+    </div>
+  );
+}
 
+interface ResultsDetailsProps {
+  plan: PreparednessPlan;
+  strings: UiStrings;
+}
+
+export function ResultsDetails({ plan, strings }: ResultsDetailsProps) {
+  return (
+    <div className="w-full space-y-6">
       <div className="grid gap-4 sm:grid-cols-3">
-        <Section title="Before" items={plan.before} />
-        <Section title="During" items={plan.during} />
-        <Section title="After" items={plan.after} />
+        <Section title={strings.before} items={plan.before} />
+        <Section title={strings.during} items={plan.during} />
+        <Section title={strings.after} items={plan.after} />
       </div>
 
       <section aria-labelledby="checklist-heading" className="rounded-lg border border-slate-700 bg-slate-800/50 p-5">
         <h3 id="checklist-heading" className="flex items-center gap-2 text-lg font-semibold text-teal-300">
           <ListChecks aria-hidden="true" className="h-5 w-5" />
-          Emergency checklist
+          {strings.checklist}
         </h3>
         <ul className="mt-3 divide-y divide-slate-700">
           {plan.checklist.map((c, i) => (
@@ -78,7 +91,7 @@ export function ResultsView({ weather, plan }: ResultsViewProps) {
       <section aria-labelledby="safety-heading" className="rounded-lg border border-slate-700 bg-slate-800/50 p-5">
         <h3 id="safety-heading" className="flex items-center gap-2 text-lg font-semibold text-teal-300">
           <ShieldCheck aria-hidden="true" className="h-5 w-5" />
-          Safety recommendations
+          {strings.safetyRecommendations}
         </h3>
         <ul className="mt-3 space-y-2 text-sm text-slate-200">
           {plan.safetyRecommendations.map((rec, i) => (

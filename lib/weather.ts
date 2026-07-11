@@ -1,6 +1,7 @@
 import type { DailyForecast, Severity, WeatherData } from "./types";
 
-const GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search";
+const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
+const NOMINATIM_USER_AGENT = "MonsoonReady/1.0 (+https://github.com/diveshflame/PromptWars)";
 const FORECAST_URL = "https://api.open-meteo.com/v1/forecast";
 
 export class WeatherLookupError extends Error {}
@@ -12,22 +13,55 @@ interface GeocodingResult {
   country: string;
 }
 
+interface NominatimResult {
+  lat: string;
+  lon: string;
+  address?: {
+    city?: string;
+    town?: string;
+    village?: string;
+    county?: string;
+    country?: string;
+  };
+}
+
+// Nominatim's usage policy caps public requests at 1/sec. This serializes
+// calls on a shared server instance with a 1s gap between them.
+let nominatimQueue: Promise<unknown> = Promise.resolve();
+
+function throttleNominatim<T>(fn: () => Promise<T>): Promise<T> {
+  const run = nominatimQueue.then(fn, fn);
+  nominatimQueue = run
+    .catch(() => undefined)
+    .then(() => new Promise((resolve) => setTimeout(resolve, 1000)));
+  return run;
+}
+
 async function geocodeCity(city: string): Promise<GeocodingResult> {
-  const url = `${GEOCODING_URL}?name=${encodeURIComponent(city)}&count=1&language=en&format=json`;
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new WeatherLookupError("Failed to look up location");
-  }
-  const data = await res.json();
-  const result = data.results?.[0];
+  const url = `${NOMINATIM_URL}?q=${encodeURIComponent(city)}&format=jsonv2&addressdetails=1&limit=1`;
+
+  const results = await throttleNominatim(async () => {
+    const res = await fetch(url, { headers: { "User-Agent": NOMINATIM_USER_AGENT } });
+    if (!res.ok) {
+      throw new WeatherLookupError("Failed to look up location. Please try again.");
+    }
+    return (await res.json()) as NominatimResult[];
+  });
+
+  const result = results[0];
   if (!result) {
-    throw new WeatherLookupError(`Could not find location "${city}"`);
+    throw new WeatherLookupError(
+      `Could not find "${city}". Check the spelling, or try a nearby larger city or town instead.`,
+    );
   }
+
+  const address = result.address ?? {};
+  const name = address.city || address.town || address.village || address.county || city;
   return {
-    latitude: result.latitude,
-    longitude: result.longitude,
-    name: result.name,
-    country: result.country ?? "",
+    latitude: parseFloat(result.lat),
+    longitude: parseFloat(result.lon),
+    name,
+    country: address.country ?? "",
   };
 }
 
@@ -46,7 +80,7 @@ export async function fetchWeather(city: string): Promise<WeatherData> {
 
   const res = await fetch(`${FORECAST_URL}?${params}`);
   if (!res.ok) {
-    throw new WeatherLookupError("Failed to fetch forecast data");
+    throw new WeatherLookupError("Failed to fetch forecast data. Please try again.");
   }
   const data = await res.json();
 
