@@ -63,3 +63,31 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+----
+
+# Project Instructions — Competition Build
+
+## Task-size calibration (important)
+Superpowers' clarify → design → plan → code → verify cycle should scale to the size of the request:
+- **Large tasks** (initial scaffold, new feature, architecture decisions): run the full cycle.
+- **Small tasks** (styling tweaks, copy changes, quick bug fixes, follow-up iterations): skip clarification and verification ceremony by default. Make the change directly and concisely. Only ask a clarifying question if the request is genuinely ambiguous in a way that would produce the wrong result.
+- If a small, low-ambiguity change is taking more than ~5 minutes, stop and simplify the approach rather than continuing to elaborate.
+
+## Known gotchas — handle proactively, don't wait to be asked
+1. **Supabase RLS is on by default.** Whenever creating or writing to a table, explicitly set and state the RLS policy applied (or confirm RLS is disabled for test purposes). Never leave this unstated.
+2. **Vercel env vars do not carry over from `.env.local`.** After adding any new environment variable, remind me it also needs to be added in the Vercel dashboard or via `vercel env add`, and that a redeploy is required for it to take effect.
+3. **Vercel Deployment Protection can block public access.** Before considering a deploy "done," note that Deployment Protection should be checked/disabled so the live URL is publicly accessible without login.
+4. **Persona/role-play framing in prompts has little effect on your behavior** — don't rely on it; follow the explicit constraints given instead.
+
+## Priorities (this app is judged on, in this order of importance)
+1. **Functionality working** — a live app with no errors beats a feature-rich but broken one. Verify core flows work end-to-end before polishing anything else.
+2. **Testing** — include at least basic tests for core logic; use Playwright for E2E verification of the main user flow before considering a feature done.
+3. **Code structure** — keep modular, conventional folder structure (`components/`, `lib/`, `api/` etc.). Don't let structure degrade silently during quick fixes — if asked for a "structure review," treat it as its own task worth the full ceremony.
+4. **UI** — use the Frontend Design plugin's guidance; avoid generic/templated styling. Only prioritize this after 1–3 are solid.
+
+## Deploy behavior
+- Never run `vercel --prod` without explicit confirmation from me first.
+- When proposing a production deploy, remind me to check the live URL in an incognito window afterward to confirm public accessibility.
+
+NOTE :
+When told something is lower priority or to minimize effort on it, always still include a minimal working version — never interpret deprioritization as omission.
