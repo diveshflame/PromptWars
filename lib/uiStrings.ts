@@ -15,6 +15,12 @@ export interface UiStrings {
   after: string;
   checklist: string;
   safetyRecommendations: string;
+  voiceInputLabel: string;
+  listening: string;
+  understandingVoice: string;
+  voiceInputError: string;
+  readAloud: string;
+  stopReading: string;
 }
 
 const EN: UiStrings = {
@@ -34,6 +40,12 @@ const EN: UiStrings = {
   after: "After",
   checklist: "Emergency checklist",
   safetyRecommendations: "Safety recommendations",
+  voiceInputLabel: "Speak city & household size",
+  listening: "Listening…",
+  understandingVoice: "Understanding…",
+  voiceInputError: "Couldn't understand. Please try again or type manually.",
+  readAloud: "Read plan aloud",
+  stopReading: "Stop reading",
 };
 
 const UI_STRINGS: Record<string, UiStrings> = {
@@ -55,6 +67,12 @@ const UI_STRINGS: Record<string, UiStrings> = {
     after: "बाद में",
     checklist: "आपातकालीन सूची",
     safetyRecommendations: "सुरक्षा सिफारिशें",
+    voiceInputLabel: "शहर और परिवार का आकार बोलें",
+    listening: "सुन रहा है…",
+    understandingVoice: "समझा जा रहा है…",
+    voiceInputError: "समझ नहीं आया। कृपया फिर कोशिश करें या मैन्युअल रूप से टाइप करें।",
+    readAloud: "योजना सुनें",
+    stopReading: "पढ़ना बंद करें",
   },
   Bengali: {
     subtitle: "রিয়েল-টাইম পূর্বাভাস, আপনার ভাষায় এআই-ব্যক্তিগতকৃত প্রস্তুতি পরিকল্পনা।",
@@ -73,6 +91,12 @@ const UI_STRINGS: Record<string, UiStrings> = {
     after: "পরে",
     checklist: "জরুরি চেকলিস্ট",
     safetyRecommendations: "নিরাপত্তা সুপারিশ",
+    voiceInputLabel: "শহর ও পরিবারের আকার বলুন",
+    listening: "শুনছে…",
+    understandingVoice: "বোঝা হচ্ছে…",
+    voiceInputError: "বুঝতে পারিনি। আবার চেষ্টা করুন বা নিজে টাইপ করুন।",
+    readAloud: "পরিকল্পনা শুনুন",
+    stopReading: "পড়া বন্ধ করুন",
   },
   Marathi: {
     subtitle: "रिअल-टाइम अंदाज, तुमच्या भाषेत एआय-वैयक्तिकृत तयारी योजना.",
@@ -91,6 +115,12 @@ const UI_STRINGS: Record<string, UiStrings> = {
     after: "नंतर",
     checklist: "आपत्कालीन यादी",
     safetyRecommendations: "सुरक्षा शिफारसी",
+    voiceInputLabel: "शहर आणि कुटुंबाचा आकार बोला",
+    listening: "ऐकत आहे…",
+    understandingVoice: "समजून घेतले जात आहे…",
+    voiceInputError: "समजले नाही. कृपया पुन्हा प्रयत्न करा किंवा स्वतः टाइप करा.",
+    readAloud: "योजना ऐका",
+    stopReading: "वाचणे थांबवा",
   },
   Tamil: {
     subtitle: "நிகழ்நேர முன்னறிவிப்பு, உங்கள் மொழியில் AI-தனிப்பயனாக்கப்பட்ட தயார்நிலைத் திட்டங்கள்.",
@@ -109,6 +139,12 @@ const UI_STRINGS: Record<string, UiStrings> = {
     after: "பின்பு",
     checklist: "அவசர பட்டியல்",
     safetyRecommendations: "பாதுகாப்பு பரிந்துரைகள்",
+    voiceInputLabel: "நகரம் மற்றும் குடும்ப அளவைச் சொல்லுங்கள்",
+    listening: "கேட்கிறது…",
+    understandingVoice: "புரிந்துகொள்ளப்படுகிறது…",
+    voiceInputError: "புரியவில்லை. மீண்டும் முயற்சிக்கவும் அல்லது நேரடியாக தட்டச்சு செய்யவும்.",
+    readAloud: "திட்டத்தைக் கேளுங்கள்",
+    stopReading: "படிப்பதை நிறுத்து",
   },
   Telugu: {
     subtitle: "నిజ-సమయ సూచన, మీ భాషలో AI-వ్యక్తిగతీకరించిన సంసిద్ధత ప్రణాళికలు.",
@@ -127,6 +163,12 @@ const UI_STRINGS: Record<string, UiStrings> = {
     after: "తర్వాత",
     checklist: "అత్యవసర జాబితా",
     safetyRecommendations: "భద్రతా సిఫార్సులు",
+    voiceInputLabel: "నగరం మరియు కుటుంబ పరిమాణం చెప్పండి",
+    listening: "వింటోంది…",
+    understandingVoice: "అర్థం చేసుకుంటోంది…",
+    voiceInputError: "అర్థం కాలేదు. దయచేసి మళ్లీ ప్రయత్నించండి లేదా మీరే టైప్ చేయండి.",
+    readAloud: "ప్రణాళికను వినండి",
+    stopReading: "చదవడం ఆపండి",
   },
   Gujarati: {
     subtitle: "રીઅલ-ટાઇમ આગાહી, તમારી ભાષામાં AI-વ્યક્તિગત તૈયારી યોજનાઓ.",
@@ -145,6 +187,12 @@ const UI_STRINGS: Record<string, UiStrings> = {
     after: "પછી",
     checklist: "કટોકટી ચેકલિસ્ટ",
     safetyRecommendations: "સલામતી ભલામણો",
+    voiceInputLabel: "શહેર અને કુટુંબનું કદ બોલો",
+    listening: "સાંભળી રહ્યું છે…",
+    understandingVoice: "સમજવામાં આવી રહ્યું છે…",
+    voiceInputError: "સમજાયું નહીં. કૃપા કરીને ફરી પ્રયાસ કરો અથવા જાતે ટાઇપ કરો.",
+    readAloud: "યોજના સાંભળો",
+    stopReading: "વાંચવાનું બંધ કરો",
   },
   Kannada: {
     subtitle: "ನೈಜ-ಸಮಯದ ಮುನ್ಸೂಚನೆ, ನಿಮ್ಮ ಭಾಷೆಯಲ್ಲಿ AI-ವೈಯಕ್ತಿಕಗೊಳಿಸಿದ ಸಿದ್ಧತಾ ಯೋಜನೆಗಳು.",
@@ -163,6 +211,12 @@ const UI_STRINGS: Record<string, UiStrings> = {
     after: "ನಂತರ",
     checklist: "ತುರ್ತು ಪಟ್ಟಿ",
     safetyRecommendations: "ಸುರಕ್ಷತಾ ಶಿಫಾರಸುಗಳು",
+    voiceInputLabel: "ನಗರ ಮತ್ತು ಕುಟುಂಬದ ಗಾತ್ರವನ್ನು ಹೇಳಿ",
+    listening: "ಕೇಳುತ್ತಿದೆ…",
+    understandingVoice: "ಅರ್ಥಮಾಡಿಕೊಳ್ಳಲಾಗುತ್ತಿದೆ…",
+    voiceInputError: "ಅರ್ಥವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ನೀವೇ ಟೈಪ್ ಮಾಡಿ.",
+    readAloud: "ಯೋಜನೆಯನ್ನು ಕೇಳಿ",
+    stopReading: "ಓದುವುದನ್ನು ನಿಲ್ಲಿಸಿ",
   },
   Malayalam: {
     subtitle: "തത്സമയ പ്രവചനം, നിങ്ങളുടെ ഭാഷയിൽ AI-വ്യക്തിഗതമാക്കിയ തയ്യാറെടുപ്പ് പദ്ധതികൾ.",
@@ -181,6 +235,12 @@ const UI_STRINGS: Record<string, UiStrings> = {
     after: "ശേഷം",
     checklist: "അടിയന്തര പട്ടിക",
     safetyRecommendations: "സുരക്ഷാ ശുപാർശകൾ",
+    voiceInputLabel: "നഗരവും കുടുംബ വലുപ്പവും പറയുക",
+    listening: "കേൾക്കുന്നു…",
+    understandingVoice: "മനസ്സിലാക്കുന്നു…",
+    voiceInputError: "മനസ്സിലായില്ല. ദയവായി വീണ്ടും ശ്രമിക്കുക അല്ലെങ്കിൽ സ്വയം ടൈപ്പ് ചെയ്യുക.",
+    readAloud: "പദ്ധതി കേൾക്കുക",
+    stopReading: "വായന നിർത്തുക",
   },
   Punjabi: {
     subtitle: "ਰੀਅਲ-ਟਾਈਮ ਪੂਰਵ ਅਨੁਮਾਨ, ਤੁਹਾਡੀ ਭਾਸ਼ਾ ਵਿੱਚ AI-ਵਿਅਕਤੀਗਤ ਤਿਆਰੀ ਯੋਜਨਾਵਾਂ।",
@@ -199,6 +259,12 @@ const UI_STRINGS: Record<string, UiStrings> = {
     after: "ਬਾਅਦ",
     checklist: "ਐਮਰਜੈਂਸੀ ਸੂਚੀ",
     safetyRecommendations: "ਸੁਰੱਖਿਆ ਸਿਫ਼ਾਰਸ਼ਾਂ",
+    voiceInputLabel: "ਸ਼ਹਿਰ ਅਤੇ ਪਰਿਵਾਰ ਦਾ ਆਕਾਰ ਬੋਲੋ",
+    listening: "ਸੁਣ ਰਿਹਾ ਹੈ…",
+    understandingVoice: "ਸਮਝਿਆ ਜਾ ਰਿਹਾ ਹੈ…",
+    voiceInputError: "ਸਮਝ ਨਹੀਂ ਆਇਆ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ ਜਾਂ ਖੁਦ ਟਾਈਪ ਕਰੋ।",
+    readAloud: "ਯੋਜਨਾ ਸੁਣੋ",
+    stopReading: "ਪੜ੍ਹਨਾ ਬੰਦ ਕਰੋ",
   },
   Spanish: {
     subtitle: "Pronóstico en tiempo real, planes de preparación personalizados por IA, en tu idioma.",
@@ -217,6 +283,12 @@ const UI_STRINGS: Record<string, UiStrings> = {
     after: "Después",
     checklist: "Lista de emergencia",
     safetyRecommendations: "Recomendaciones de seguridad",
+    voiceInputLabel: "Di la ciudad y el tamaño del hogar",
+    listening: "Escuchando…",
+    understandingVoice: "Entendiendo…",
+    voiceInputError: "No se entendió. Inténtalo de nuevo o escribe manualmente.",
+    readAloud: "Leer el plan en voz alta",
+    stopReading: "Detener lectura",
   },
   French: {
     subtitle: "Prévisions en temps réel, plans de préparation personnalisés par IA, dans votre langue.",
@@ -235,6 +307,12 @@ const UI_STRINGS: Record<string, UiStrings> = {
     after: "Après",
     checklist: "Liste de contrôle d'urgence",
     safetyRecommendations: "Recommandations de sécurité",
+    voiceInputLabel: "Dites la ville et la taille du foyer",
+    listening: "Écoute…",
+    understandingVoice: "Compréhension…",
+    voiceInputError: "Incompris. Veuillez réessayer ou taper manuellement.",
+    readAloud: "Lire le plan à voix haute",
+    stopReading: "Arrêter la lecture",
   },
 };
 

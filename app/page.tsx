@@ -114,7 +114,7 @@ export default function Home() {
 
             {result && (
               <div className="fade-in w-full">
-                <ResultsOverview weather={result.weather} plan={result.plan} strings={strings} />
+                <ResultsOverview weather={result.weather} plan={result.plan} strings={strings} language={language} />
               </div>
             )}
           </div>

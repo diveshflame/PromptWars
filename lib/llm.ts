@@ -79,12 +79,7 @@ Generate a JSON response with:
 Everything in the response must be written in ${input.language}.`;
 }
 
-export async function generatePlan(
-  input: UserInput,
-  weather: WeatherData,
-  severity: Severity,
-  baseChecklist: ChecklistItem[],
-): Promise<LlmPlanContent> {
+async function callGemini(prompt: string, schema: object): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new LlmError("GEMINI_API_KEY is not configured");
@@ -97,10 +92,10 @@ export async function generatePlan(
       "x-goog-api-key": apiKey,
     },
     body: JSON.stringify({
-      contents: [{ parts: [{ text: buildPrompt(input, weather, severity, baseChecklist) }] }],
+      contents: [{ parts: [{ text: prompt }] }],
       generationConfig: {
         responseMimeType: "application/json",
-        responseSchema: RESPONSE_SCHEMA,
+        responseSchema: schema,
       },
     }),
   });
@@ -115,6 +110,54 @@ export async function generatePlan(
   if (!text) {
     throw new LlmError("Gemini API returned no content");
   }
+  return text;
+}
 
+export async function generatePlan(
+  input: UserInput,
+  weather: WeatherData,
+  severity: Severity,
+  baseChecklist: ChecklistItem[],
+): Promise<LlmPlanContent> {
+  const text = await callGemini(buildPrompt(input, weather, severity, baseChecklist), RESPONSE_SCHEMA);
   return JSON.parse(text) as LlmPlanContent;
+}
+
+export interface VoiceParseResult {
+  city: string | null;
+  householdSize: number | null;
+}
+
+const VOICE_PARSE_SCHEMA = {
+  type: "object",
+  properties: {
+    city: { type: "string", nullable: true },
+    householdSize: { type: "integer", nullable: true },
+  },
+  required: ["city", "householdSize"],
+};
+
+function buildVoiceParsePrompt(transcript: string): string {
+  return `Extract the city/location and the number of people in the household from this spoken request. The speaker may talk in any language, in any phrasing (e.g. "I'm in Mumbai, we are four people" or "Chennai, 2 people"). Numbers may be spelled out as words.
+
+Spoken text: "${transcript}"
+
+Respond with JSON: city (the location name, or null if not mentioned) and householdSize (an integer 1-20, or null if not mentioned).`;
+}
+
+/** Parses a spoken utterance into a city and household size using the LLM, since numbers and locations may be phrased in any way or language. */
+export async function parseVoiceInput(transcript: string): Promise<VoiceParseResult> {
+  const text = await callGemini(buildVoiceParsePrompt(transcript), VOICE_PARSE_SCHEMA);
+  const parsed = JSON.parse(text) as VoiceParseResult;
+
+  return {
+    city: typeof parsed.city === "string" && parsed.city.trim().length > 0 ? parsed.city.trim() : null,
+    householdSize:
+      typeof parsed.householdSize === "number" &&
+      Number.isInteger(parsed.householdSize) &&
+      parsed.householdSize >= 1 &&
+      parsed.householdSize <= 20
+        ? parsed.householdSize
+        : null,
+  };
 }

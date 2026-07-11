@@ -1,8 +1,11 @@
 "use client";
 
-import { memo, useState } from "react";
+import { memo, useCallback, useState } from "react";
+import { Mic, MicOff } from "lucide-react";
+import { getSpeechLocale } from "@/lib/speechLocales";
 import type { UserInput } from "@/lib/types";
 import type { UiStrings } from "@/lib/uiStrings";
+import { useSpeechRecognition } from "./useSpeechRecognition";
 
 const LANGUAGES = [
   "English",
@@ -30,6 +33,34 @@ interface PlanFormProps {
 function PlanFormComponent({ onSubmit, isLoading, language, onLanguageChange, strings }: PlanFormProps) {
   const [city, setCity] = useState("");
   const [householdSize, setHouseholdSize] = useState(1);
+  const [isUnderstandingVoice, setIsUnderstandingVoice] = useState(false);
+  const [voiceError, setVoiceError] = useState(false);
+
+  const handleVoiceResult = useCallback(async (transcript: string) => {
+    setVoiceError(false);
+    setIsUnderstandingVoice(true);
+    try {
+      const res = await fetch("/api/parse-voice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transcript }),
+      });
+      const data = await res.json();
+      if (!res.ok || (data.city === null && data.householdSize === null)) {
+        setVoiceError(true);
+        return;
+      }
+      if (data.city) setCity(data.city);
+      if (data.householdSize) setHouseholdSize(data.householdSize);
+    } catch {
+      setVoiceError(true);
+    } finally {
+      setIsUnderstandingVoice(false);
+    }
+  }, []);
+
+  const { isSupported: isVoiceSupported, isListening, start: startListening, stop: stopListening } =
+    useSpeechRecognition({ lang: getSpeechLocale(language), onResult: handleVoiceResult });
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -71,6 +102,34 @@ function PlanFormComponent({ onSubmit, isLoading, language, onLanguageChange, st
           className="mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 px-4 py-2.5 text-slate-100 focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-400/40"
         />
       </div>
+
+      {isVoiceSupported && (
+        <div>
+          <button
+            type="button"
+            onClick={isListening ? stopListening : startListening}
+            disabled={isUnderstandingVoice}
+            aria-pressed={isListening}
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-600 bg-slate-800 px-4 py-2.5 text-sm text-slate-200 transition-colors hover:border-teal-400 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isListening ? (
+              <MicOff aria-hidden="true" className="h-4 w-4 text-teal-400" />
+            ) : (
+              <Mic aria-hidden="true" className="h-4 w-4" />
+            )}
+            {isListening
+              ? strings.listening
+              : isUnderstandingVoice
+                ? strings.understandingVoice
+                : strings.voiceInputLabel}
+          </button>
+          {voiceError && (
+            <p role="alert" className="mt-1.5 text-xs text-red-300">
+              {strings.voiceInputError}
+            </p>
+          )}
+        </div>
+      )}
 
       <div>
         <label htmlFor="language" className="block text-sm font-medium text-slate-200">
